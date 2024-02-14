@@ -1,41 +1,78 @@
-import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
-# Importez ici d'autres bibliothèques pour les appels API si nécessaire
 
-# Fonction pour charger et préparer les données (exemple basique)
-def load_data():
-    # Remplacez 'your_file_path.csv' par le chemin de votre fichier CSV
-    data = pd.read_csv('T-Corp assets - Etienne.csv', delimiter=';')
-    # Ajoutez ici la logique pour récupérer les prix actuels et calculer la performance
-    return data
 
-data = load_data()
+import streamlit as st
+from streamlit_option_menu import option_menu
 
-# Fonction pour calculer la valeur totale du portfolio
-def calculate_total_value(data):
-    # Ceci est un placeholder, remplacez-le par votre logique de calcul
-    return np.sum(data["Prix d'achat"]*data["Quantité"]) # Exemple simplifié
+from data_loader import *
+from data_process import *
+from pages import *
 
-# Création du dashboard
-st.title('T-Corp Portfolio')
-total_value = calculate_total_value(data)
-st.header(f'Valeur totale du portfolio: {total_value}')
+st. set_page_config(layout="wide")
 
-# Création du stacked line chart pour l'évolution du portfolio
-# Placeholder, à remplacer par vos données et votre logique de graphique
-st.subheader('Évolution du Portfolio')
-st.line_chart(np.random.randn(100, 2), width=0, height=0) # Exemple simplifié
+# Data assets spreed-sheet infos
+sheet_id = "1hwdM9FykkIdUfc8FYSsqot_spsmaeUfpgJJST9CWpn8"
+sheet_names = ["Etienne", "Alex", "Ivan", "Baptiste", "Lucas"]
+name_decorators = {"Etienne": "🗿", "Alex": "💪", "Ivan": "🐁", "Baptiste": "👽", "Lucas": "🦧"}
 
-# Création du pie chart pour la répartition du portfolio
-# Placeholder, à remplacer par vos données et votre logique de graphique
-st.subheader('Répartition du Portfolio')
-fig, ax = plt.subplots()
-ax.pie([50, 50], labels=['Asset A', 'Asset B']) # Exemple simplifié
-st.pyplot(fig)
+# Load data
+data_assets = get_data(sheet_id=sheet_id, sheet_names=sheet_names)
 
-# Affichage du tableau des assets
-st.subheader('Détails des Assets')
-st.write(data)
+# Update or create st s ticker
+update_tickers(data_assets)
+
+# Load data prices
+data_prices = get_prices(data_assets)
+
+
+
+def test_page(text):
+    st.markdown("<h1 style='text-align: center;'>📈 T-Corp Portfolio 📈</h1>", unsafe_allow_html=True)
+    st.markdown(text)
+
+
+with st.sidebar:
+    selected = option_menu(
+        menu_title="Main Menu",
+        options=["Home", "🗿 Etienne", "💪 Alex", "🐁 Ivan", "👽 Baptiste", "🦧 Lucas", "☎️ About"],
+        icons=["🗿", "💪", "🐁", "👽", "🦧"],
+        menu_icon="cast",
+        default_index=0,
+        # orientation = "horizontal",
+    )
+
+
+if selected == "Home":
+    home_page()
+
+if selected == "🗿 Etienne":
+    person_page(data_assets, data_prices, "Etienne")
+    # test_page("Etienne")
+
+if selected == "💪 Alex":
+    # person_page(data, "Alex")
+    test_page("Alex")
+
+if selected == "🐁 Ivan":
+    # person_page(data, "Ivan")
+    test_page("Ivan")
+
+if selected == "👽 Baptiste":
+    # person_page(data, "Baptiste")
+    test_page("Baptiste")
+
+if selected == "🦧 Lucas":
+    # person_page(data, "Lucas")
+    test_page("Lucas")
+    st.markdown("<br>Ouvre toi un PEA mec.</br>", unsafe_allow_html=True)
+    st.page_link("https://www.boursorama.com/", label="Boursorama", icon="💰")
+
+
+if selected == "☎️ About":
+    st.markdown("<h1 style='text-align: center;'>📈 T-Corp Portfolio 📈</h1>", unsafe_allow_html=True)
+    st.markdown("La darone d'Alex suce : 0657836589")
+
+
